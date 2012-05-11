@@ -1,19 +1,44 @@
 /*
- * Tetris game on a 16x2 LCD display
- * https://github.com/dzimboum/triscalino
- * Implemented on the great Deuligne shield, by Snootlab.
+ * Tetris game on an Adafruit RGB LCD Shield
+ * https://github.com/dmalec/RgbLcdShieldTriscalino
  *
- * Please file issues and send contributions on Github.
+ * Forked/ported from https://github.com/dzimboum/triscalino
+ * Originally implemented on the great Deuligne shield, by Snootlab.
  *
  * Copyright 2012 dzimboum
  * Released under the WTFPL 2.0 license
  * http://sam.zoy.org/wtfpl/COPYING
+ *
+ * Ported by Dan Malec to the Adafruit RGB LCD Shield
+ * - Changed type of lcd (and related includes) to Adafruit_RGBLCDShield
+ * - Changed type of hiScores (and related includes) to RgbLcdShieldHiScores
+ * - Changed button logic to work with Adafruit Shield
+ * - Changed lcd.init() call to lcd.begin(16, 2)
+ * - Added setting of backlight color 
+ * - Added backlight color enum
+ *
+ * It uses an:
+ *      Adafruit RGB LCD Shield Kit:
+ *      http://www.adafruit.com/products/716
+ * or
+ *      Adafruit Negative RGB LCD Shield Kit
+ *      http://www.adafruit.com/products/714
+ *
+ * ********************************************************************************
+ * Dependencies
+ * ********************************************************************************
+ * Adafruit Industries's RGB 16x2 LCD Shield library:
+ *       https://github.com/adafruit/Adafruit-RGB-LCD-Shield-Library
+ * Adafruit Industries's MCP23017 I2C Port Expander library:
+ *       https://github.com/adafruit/Adafruit-MCP23017-Arduino-Library
+ * ********************************************************************************
  */
 
 #include <Wire.h>
-#include <Deuligne.h>
+#include <Adafruit_MCP23017.h>
+#include <Adafruit_RGBLCDShield.h>
 #include <EEPROM.h>
-#include <DeuligneHiScores.h>
+#include <RgbLcdShieldHiScores.h>
 
 #include <inttypes.h>
 #include <string.h>
@@ -27,8 +52,8 @@
  * will split rows into 2, in order to emulate a 16x4
  * display.  Yeah, this is crazy!
  */
-Deuligne lcd;
-DeuligneHiScores hiScores(lcd);
+Adafruit_RGBLCDShield lcd;
+RgbLcdShieldHiScores hiScores(lcd);
 
 // Upper square
 byte upperHalfRow[] = {
@@ -65,6 +90,9 @@ byte fullRow[] = {
   B11111,
   B11111
 };
+
+//! Enum of backlight colors.
+enum BackLightColor { RED=0x1, YELLOW=0x3, GREEN=0x2, TEAL=0x6, BLUE=0x4, VIOLET=0x5, WHITE=0x7 };
 
 /*
  * In order to draw pieces, we have to keep track of pieces
@@ -562,7 +590,7 @@ void gameInit()
   hiScores.display();
   lcd.clear();
 
-  maxCounter = 10000;
+  maxCounter = 2000;
   counter = 0;
 
   levelUp = 0;
@@ -613,14 +641,15 @@ void setup()
   }
 #endif
 
-  Wire.begin();
-  lcd.init();
+  // LCD has 16 columns & 2 rows
+  lcd.begin(16, 2);
 
   lcd.createChar(0, upperHalfRow);
   lcd.createChar(1, lowerHalfRow);
   lcd.createChar(2, fullRow);
 
-  lcd.backLight(true); // Backlight ON
+  lcd.clear();
+  lcd.setBacklight(WHITE);
 
   hiScores.begin(10, 100, 0x1020);
 
@@ -643,24 +672,24 @@ void setup()
 void loop()
 {
   ++counter;
-  key = lcd.get_key();  // read the value from the sensor & convert into key press
+  key = lcd.readButtons();  // read the value from the sensor & convert into key press
 
   if (key != oldkey)    // if keypress is detected
   {
     delay(50);          // wait for debounce time
-    key = lcd.get_key();// read the value from the sensor & convert into key press
+    key = lcd.readButtons();// read the value from the sensor & convert into key press
     if (key != oldkey)
     {
       oldkey = key;
-      if (key == 0) {
+      if (key  & BUTTON_RIGHT) {
         currentPiece.rotateClockwise();
-      } else if (key == 1) {
+      } else if (key & BUTTON_UP) {
         currentPiece.moveUp();
-      } else if (key == 2) {
+      } else if (key & BUTTON_DOWN) {
         currentPiece.moveDown();
-      } else if (key == 3) {
+      } else if (key & BUTTON_LEFT) {
         currentPiece.rotateCounterClockwise();
-      } else if (key == 4) {
+      } else if (key & BUTTON_SELECT) {
         while(currentPiece.moveRight()) {
           delay(100);
         }
