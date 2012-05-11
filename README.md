@@ -1,9 +1,9 @@
 Tetris Clone
 ===============
 
-An Arduino implementation of Tetris on a 
+An Arduino implementation of Tetris on a 16x2 LCD
 
-Forked from [dzimboum's implementation](https://github.com/dzimboum/triscalino/blob/master/triscal.ino)
+Forked from [dzimboum's implementation](https://github.com/dzimboum/triscalino/) to work with the Adafruit RGB LCD Shield
 
 Requirements
 ------------
