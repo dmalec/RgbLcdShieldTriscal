@@ -590,7 +590,7 @@ void gameInit()
   hiScores.display();
   lcd.clear();
 
-  maxCounter = 2000;
+  maxCounter = 10000;
   counter = 0;
 
   levelUp = 0;
@@ -681,7 +681,7 @@ void loop()
     if (key != oldkey)
     {
       oldkey = key;
-      if (key  & BUTTON_RIGHT) {
+      if (key & BUTTON_RIGHT) {
         currentPiece.rotateClockwise();
       } else if (key & BUTTON_UP) {
         currentPiece.moveUp();
