@@ -15,6 +15,7 @@ Dependencies
 ------------
 * [Adafruit Industries's RGB 16x2 LCD Shield library](https://github.com/adafruit/Adafruit-RGB-LCD-Shield-Library)
 * [Adafruit Industries's MCP23017 I2C Port Expander library](https://github.com/adafruit/Adafruit-MCP23017-Arduino-Library)
+* [RGB LCD Shield Hi Scores library](https://github.com/dmalec/RgbLcdShieldHiScores)
 
 Installing
 ----------
