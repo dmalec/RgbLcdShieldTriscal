@@ -589,7 +589,9 @@ int key, oldkey;
 
 void gameInit()
 {
+  lcd.setBacklight(TEAL);
   hiScores.display();
+  lcd.setBacklight(WHITE);
   lcd.clear();
 
   maxCounter = 10000;
@@ -651,7 +653,7 @@ void setup()
   lcd.createChar(2, fullRow);
 
   lcd.clear();
-  lcd.setBacklight(WHITE);
+  lcd.setBacklight(TEAL);
 
   hiScores.begin(10, 100, 0x1020);
 
